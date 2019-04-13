@@ -1,0 +1,352 @@
+---
+title: "Linux Learning"
+author: "熊逸"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  prettydoc::html_pretty:
+    highlight: github
+    theme: hpstr
+    toc: yes
+slug: 002-linux-shell
+tags:
+- linux
+- shell
+categories: playcloud
+---
+
+# 简答题
+## 1. 计算机硬件和软件的关系是什么？
+**硬件**是计算机所有物理设备是计算机系统中各种设备的总称。  
+**软件**是指计算机系统中的程序及其文档。  
+计算机的硬件与软件之间都是相互依赖、相互影响、相互促进  
+硬件包括有CPU、内存、储存设备。  
+软件包括有系统软件、应用软件  
+
+## 2. 常见的 Linux 发行版本有哪些？它们的主要差别在什么地方？  
+
+### 常见的 Linux 发行版本有哪些  
+
+| System        | Intro.           | 
+| ------------- |:-------------:| 
+| Debian      | 运行起来极其稳定，这使得它非常适合用于服务器 | 
+| Gentoo      | 被认为是最佳学习对象，可以进而了解Linux操作系统的内部运作原理,初学者使用有难度      |
+| Damn Vulnerable Linux | 易受到攻击，在于借机训练Linux管理员      | 
+| 红帽企业级Linux | 第一款面向商业市场的Linux发行版。      | 
+| CentOS | 使用红帽企业级Linux中的免费源代码重新构建而成  | 
+| Fedora | 红帽公司的一个测试平台，发行版较多     | 
+
+## 3. 如何在一台全新的计算机上安装 Linux 操作系统？
+
+Windows安装虚拟机或者使用内置的Ubuntu系统
+
+## 4. 在 Win10 自带的子系统下运行 Ubuntu，和独立使用 Ubuntu 系统，前者的优缺点如何？
+
+优点：双系统来回切换
+
+缺点：Linux是单独的一套系统，需要单独占用内存。界面也是在windows系统下的界面。
+
+## 5. Linux 系统常见的文件系统有哪几种？Windows系统上看到的C盘、D盘，在Linux 系统下是以什么样的形式存在？  
+
+Linux 系统常见的文件系统包括日志文件系统ext3、ReiserFS、XFSJFS和其它文件系统  
+
+Liunx采用树形的文件管理系统，也就是在Linux系统中，可以说已经没有分区的概念
+
+## 6. 什么是“根目录“、“家目录”？
+
+**根目录** /指的是最上层的目录,根目录之下有很多目录，如/home,/etc,/lib，/root .
+
+**家目录**：一般普通用户,家目录是/home/用户名;root用户，家目录是/root
+
+## 7. 简述文件的绝对路径和相对路径
+
+绝对路径，从根目录为起点到你所在的目录； 相对路径，从一个目录为起点到你所在的目录。 
+
+## 8. Linux 系统在根目录（/）下一般会有哪些目录，它们分别有什么作用？
+```{}
+/bin 二进制可执行命令
+/dev 设备特殊文件 
+/etc 系统管理和配置文件 
+/etc/rc.d 启动的配置文件和脚本 
+/home 用户主目录的基点，比如用户user的主目录就是/home/user，可以用~user表示 
+/lib 标准程序设计库，又叫动态链接共享库，作用类似windows里的.dll文件 
+/sbin 超级管理命令，这里存放的是系统管理员使用的管理程序 
+/tmp 公共的临时文件存储点 
+/root 系统管理员的主目录 
+/mnt 系统提供这个目录是让用户临时挂载其他的文件系统 
+/lost+found这个目录平时是空的，系统非正常关机而留下“无家可归”的文件。 
+/proc 虚拟的目录，是系统内存的映射。可直接访问这个目录来获取系统信息。 
+/var 某些大文件的溢出区，比方说各种服务的日志文件 
+/usr 最庞大的目录，要用到的应用程序和文件几乎都在这个目录，其中包含：
+/usr/x11R6 存放x window的目录 
+/usr/bin 众多的应用程序 
+/usr/sbin 超级用户的一些管理程序 
+/usr/doc linux文档 
+/usr/include linux下开发和编译应用程序所需要的头文件 
+/usr/lib 常用的动态链接库和软件包的配置文件 
+/usr/man 帮助文档 
+/usr/src 源代码，linux内核的源代码就放在/usr/src/linux里 
+/usr/local/bin 本地增加的命令 
+/usr/local/lib 本地增加的库根文件系统
+```
+## 9. 什么是 Linux 系统的内核，如何查看内核版本号？
+```{shell}
+uname -a
+```
+结果
+```{}
+MINGW64_NT-10.0 LAPTOP-HERK37QB 2.10.0(0.325/5/3) 2018-07-25 13:06 x86_64 Msys
+```
+```{shell}
+cat /proc/version
+```
+结果
+```{}
+MINGW64_NT-10.0 version 2.10.0(0.325/5/3) (@8d059672d1f9) (gcc version 7.3.0 (GCC) ) 2018-07-25 13:06
+```
+## 10. 在 Linux 下如何查看电脑的硬件信息（如内存、CPU、硬盘、显卡等）
+查看CPU
+```{shell}
+cat /proc/cpuinfo | grep "model name" && cat /proc/cpuinfo | grep "physical id"
+```
+我的电脑
+```{}
+model name      : Intel(R) Core(TM) i7-7700HQ CPU @ 2.80GHz
+model name      : Intel(R) Core(TM) i7-7700HQ CPU @ 2.80GHz
+model name      : Intel(R) Core(TM) i7-7700HQ CPU @ 2.80GHz
+model name      : Intel(R) Core(TM) i7-7700HQ CPU @ 2.80GHz
+model name      : Intel(R) Core(TM) i7-7700HQ CPU @ 2.80GHz
+model name      : Intel(R) Core(TM) i7-7700HQ CPU @ 2.80GHz
+model name      : Intel(R) Core(TM) i7-7700HQ CPU @ 2.80GHz
+model name      : Intel(R) Core(TM) i7-7700HQ CPU @ 2.80GHz
+physical id     : 0
+physical id     : 0
+physical id     : 0
+physical id     : 0
+physical id     : 0
+physical id     : 0
+physical id     : 0
+physical id     : 0
+```
+查看内存
+```
+cat /proc/meminfo |grep MemTotal  
+```
+查看
+```
+fdisk -l |grep Disk   
+```
+## 11. 在Linux 需要使用哪些命令来挂载一个移动硬盘？
+首先使用管理员权限sudo
+```{shell}
+fdisk -l #查看硬盘分区
+mkdir /mnt/usb #挂载u盘的位置
+mount /dev/sdb1 /mnt/usb #挂载
+umount /mnt/usb #弹出
+```
+## 12. Linux 系统中的 644、755、777 文件权限分别表示什么意思？他们的数字是怎么计算得来的？修改文件权限的命令是什么？怎么设置用户文件的默认权限？
+```
+-rw-rw-rw- (666)   所有用户都有文件读、写权限。
+-rwxrwxrwx (777)  所有用户都有读、写、执行权限。
+-rw-r--r-- (644)      只有拥有者有读写权限；而属组用户和其他用户只有读权限。
+-rwxr-xr-x (755)    拥有者有读、写、执行权限；而属组用户和其他用户只有读、执行权限。
+计算方法：r=4，w=2，x=1 。相加得到数值，如： rwx = 4 + 2 + 1 = 7 rw = 4 + 2 = 6 rx = 4 +1 = 5
+修改权限：chmod <abc> file...
+默认权限：umask
+```
+## 13. rsync，scp 都可以用来在服务器之间传输文件，它们的主要区别是什么？
+
+一般而言，我们会选择使用rsync进行远程同步或拷贝。rsync和scp的区别在于：
+
+- rsync只对差异文件做更新，可以做增量或全量备份；而scp只能做全量备份。简单说就是rsync只传修改了的部分，如果改动较小就不需要全部重传，所以rsync备份速度较快；默认情况下，rsync通过比较文件的最后修改时间（mtime）和文件的大小（size）来确认哪些文件需要被同步过去。
+- rsync是分块校验+传输，scp是整个文件传输。rsync比scp有优势的地方在于单个大文件的一小部分存在改动时，只需传输改动部分，无需重新传输整个文件。如果传输一个新的文件，理论上rsync没有优势；
+- rsync不是加密传输，而scp是加密传输，使用时可以按需选择。
+
+## 14. 在命令行界面，如何用 Vim 编辑器打开一个文本文件、创建一个文件、对文件进行修改和保存？
+
+```{shell}
+# 基本上vi可以分为三种状态，分别是命令模式（command mode）、插入模式（Insert mode）和底行模式（last line mode）.
+
+#进入vim编辑器
+vi [filename]
+
+#按i进入insert模式
+
+#保存并退出,先按Esc键
+:wq
+
+```
+
+## 15. 什么是 stderr 和 stdout？
+
+## 16. 管道在 Shell 中是一个什么样的角色？
+
+```
+管道就是用“|”连接两个命令，以前面一个命令的输出作为后面命令的输入，用于把管道左边的输出作为右边的输入。 
+语法：命令1 | 命令2 | 命令n 
+例如：echo “hello linux” | wc
+```
+
+## 17. 如何使用管道将上游的数据传入 Vim 编辑器？
+
+```
+> #重定向
+
+```
+## 18. 如何将程序的 stdout 和 stderr 通过管道输出到两个文件？
+## 19. 如何查看隐藏文件
+
+```
+#显示所有文件（包含隐藏文件）
+ls -a
+
+#只显示隐藏文件
+l.
+
+#或者
+ls -d .*
+```
+## 20. 如何使用ROOT权限？如何切换不同的身份
+
+```
+su root #切到root用户，我们可以看到$变成了#，#说明现在是使用root用户
+
+su [user name] #切换到普通用户
+```
+## 21. 如果输入的shell脚本过长，快速删除有哪些快捷键呢？如何快速调整光标位置
+
+```
+#Ctrl + F : 光标向前移动一个字符,相当与->(forwards)
+#Ctrl + B : 光标向后移动一个字符,相当与<-(backwards)
+
+#Ctrl + A : 切到命令行开始(ahead)
+#Ctrl + E : 切到命令行结尾(end)
+
+#Ctrl + H : 向前删除一个字符
+#Ctrl + D : 向后删除一个字符
+
+#Ctrl + W : 清除光标之前的一个词（以空格、标点等为分隔符）
+
+#Ctrl + K : 清除光标之后的内容
+
+#Ctrl + U : 删除光标之前的内容
+
+#Ctrl + L : 清屏，类似于 clear 命令
+
+#Ctrl + R : 从命令历史中搜索命令　
+#Ctrl + C : 终止命令　
+#Ctrl + D : 退出 shell
+```
+## 22.Linux 文件操作时，比较 awk/grep/sed 三剑客的用法
+
+```
+-记住三个命令的运用形式
+     grep    '字符'       文件
+     sed     '命令'       文件
+     awk    '条件{命令}'   文件
+-死记一点，单引号内就是正则表达式的用法
+```
+awk是一个强大的文本分析工具，相对于grep的查找，sed的编辑，awk在其对数据分析并生成报告时，显得尤为强大。简单来说awk就是把文件逐行的读入，以空格为默认分隔符将每行切片，切开的部分再进行各种分析处理。
+
+```awk [-F  field-separator]  'commands'  input-file(s)```
+其中，commands 是真正awk命令，[-F域分隔符]是可选的。 input-file(s) 是待处理的文件。
+在awk中，文件的每一行中，由域分隔符分开的每一项称为一个域。通常，在不指名-F域分隔符的情况下，默认的域分隔符是空格。
+
+## 23.Linux 系统中哪个文件是黑洞，可以吃掉 Shell 管道中流动的信息
+## 24.Linux 系统如何设置开机自动挂载（mount）你的移动介质（如U盘、移动硬盘）
+## 25.如何组装服务器和安装Linux系统
+## 26.Linux有哪些常见系统，以及它们的区别是什么
+## 27.Linux三剑客是哪三个，常用命令有哪些
+## 28.Windows 子系统（WSL）的安装目录如何从迁移？
+## 29.WSL 如何自动挂载硬盘使其目录保持755，文件保持644权限？
+## 30.如何批量修改某个目录下的目录权限为755，文件权限为644？
+## 31.在 Windows 桌面环境直接编辑 WSL 内的目录和文件（自动挂载的目录和文件除外）有什么后果？
+## 32.如何设置 Vim 编辑器，使其支持：a) 文件/目录路径提示和自动补全; b) Python 函数自动补全；c) 左侧显示目录树；d) 各种文件的语法高亮
+## 33.什么是 X server?
+X server是Linux系统里面图形接口服务器的简称。Windows系统的界面是这个系统不可分割的一部分，各种窗口操作界面显示都是由系统核心直接管理的，而Linux的图形界面并不是系统的必要组成部分，它可以在无界面的条件下运行。当需要Linux提供界面的时候，系统就会建立一个或者数个X server，通过X协议跟窗口管理器交互，由独立于系统的应用程序来产生窗口，状态栏，按钮之类的交互界面。
+## 34. Manjaro Deepin Linux 是一个什么样的存在？
+Deepin是由武汉深之度科技有限公司开发的Linux发行版。Deepin 是一个基于 Linux 的操作系统，专注于使用者对日常办公、学习、生活和娱乐的操作体验的极致，适合笔记本、桌面计算机和一体机。Manjaro衍生于Deepin
+## 35.Centos 系统如何开放指定端口的入和出的访问？
+## 36.Centos 和 Ubuntu 系统如何查看当前服务器的 IP地址和 MAC 地址?
+## 37.Centos 和 Ubuntu 系统如何查看即时网速？
+## 38.如果你没有买域名，如何在本地模拟某个域名的访问？
+## 39.如何查看并设置当前环境的语言？en_us.utf-8和zh_cn.utf-8分别代表什么？
+## 40.如何新增一个用户并赋予该用户root权限？
+## 41.跟nano相比，vim的优势在哪里？在vim里，p 与 P 两种指令下粘贴的效果有什么区别？
+## 42.在vim中，编辑完文件后显示 E45: 'readonly' option is set 时，如何强制写入该档案并保存退出？？
+
+```
+操作方法很简单，只需要几个命令即可
+
+1、下载 LxRunOffline（点此下载）
+
+2、解压出来，然后在当前目录上使用CMD，然后输入命令，查看你所使用的系统
+
+lxrunoffline list
+3、在你想要新建系统的目录上创建一个文件夹，比如文件夹位置在D:\Debian
+
+lxrunoffline move -n Debian -d D:\Debian
+4、移动需要比较久的时间，完成之后，你可以输入下面命令查看
+
+lxrunoffline get-dir -n Debian
+```
+# 编程题
+
+## 1. 使用 bash 实现一个函数，输入整数 n，得到 1 到 n 的累加和
+```{shell}
+AddN(){
+    echo "这个函数会对1至n进行累加和"
+    echo "输入n"
+    read aNum
+    echo "n 为 $aNum "
+    echo "输出的结果为"
+    echo $[($aNum+1)*($aNum)/2]
+}
+```
+测试结果
+```{shell}
+AddN
+
+n = 10
+这个函数会对1至n进行累加和
+输入n
+10
+n 为 10
+输出的结果为
+55
+
+n = 100 
+这个函数会对1至n进行累加和
+输入n
+100
+n 为 100
+输出的结果为
+5050
+```
+
+## 2. 通过 Shell 命令提取 gtf 中编码基因的 gene symbol 和 gene id
+1. 筛选出编码基因
+2. 选择gene symbol 和 gene id
+```{shell}
+awk -F "\t" '$3 == "gene" { print $9 }' gencode.v22.annotation.gtf | awk -F "; " '$2 == "gene_type \"protein_coding\"" {print $1"/t"$4}' > gsym.txt
+awk -F "\t" '$3 == "gene" { print $9 }' gencode.v22.annotation.gtf | awk -F "; " '$2 == "gene_type \"protein_coding\"" {print $1"/t"$4}' | wc -l #19814个基因
+```
+
+## 3. 假设有如下文件“sample.txt"，文件中包含有若干列重复列。请保留一列重复列，并不影响列顺序。
+```{shell}
+cat example.txt | tr '[,]' '[\t]' > newfile.txt #逗号分隔改为Tab分隔
+awk 'NR==1{for(i=1;i<=NF;i++)b[$i]++&&a[i]}{for(i in a)$i="";gsub(" +"," ")}1' newfile.txt > newfile.txt
+
+```
+结果
+```
+COL1 COL2 COL3 COL4 COL2
+1 2 3 4 2
+a1 a2 a3 a4 a2
+b1 b2 b3 b4 b2
+d1 d2 d3 d4 d2
+```
+## 4. 使用 bash 编程实现时间戳功能，如下为 ngsjs 的 rtime_stamp 命令行程序（R语言）输出
+
+## 5. 尝试使用源码编译安装最新版本的 R，记录过程中遇到的问题。同时使用系统自带的包管理器（如 centos 的yum；Debian/Ubuntu 的 apt；arch、manjaro 的 pacman）、conda 和 spack 安装相同版本的 R。
+
+## 6. 使用 spack 在指定不同版本的 gcc 编译器（如8.3、5.4 和 4.8）情况下安装最新版本的R。并比较一些 R 基础函数的速度在计算较大数据量时是否有变化。

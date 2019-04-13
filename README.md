@@ -4,6 +4,10 @@
 
 Just for fun on 'cloud'.
 
+### Linux and Shell
+
+- [Question and answer](./learning/part1-linux-shell/)
+
 ## License
 
 [![](https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png)](https://creativecommons.org/licenses/by-nc-nd/4.0/)
