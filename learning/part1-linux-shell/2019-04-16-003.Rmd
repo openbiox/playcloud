@@ -1,0 +1,709 @@
+---
+title: "Practice of Linux and Shell"
+author: "陈颖珊"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  prettydoc::html_pretty:
+    highlight: github
+    theme: hpstr
+    toc: yes
+slug: 003-linux-shell
+tags:
+- linux
+- shell
+categories: playcloud
+---
+### 关于内核和发行版本
+#### 计算机硬件和软件的关系是什么？
+硬件是物理设备，是计算机运行的物质基础。
+
+软件是核心，只有硬件没有软件，计算机就是个空盒子。
+
+我的理解是好比一个酒店的厨房：厨房空间大小，抽风系统，排水管道，灶台数量，水电安装都是厨房的**硬件**，各种厨具则是这个厨房的**软件**，厨具是做菜的必备条件，没有这些“软件”，环境配置再高级的厨房也是个空房子，而厨师当然就相当于用户啦。
+#### 常见的 Linux 发行版本有哪些？它们的主要差别在什么地方？
+Linux发行版则是Linux内核基础上添加了不同工具软件构成的一套操作系统。虽然内核都是一样的，但添加部分各不相同，这就构成了不同的发行版本。最常见的发行版本有：
+
+**Debian/Ubuntu**： Debian系列，包括Debian和Ubuntu等.Debian最具特色的是`apt-get`/`dpkg`包管理方式。Ubuntu是基于Debian的unstable版本加强而来，由其搭载的Linux桌面系统界面非常友好。常见的是基于Gnome的Ubuntu，基于KDE的Kubuntu以及基于Xfc的Xubuntu。就易用性和兼容性而言,Ubuntu比较适合新手。
+**RedHat**：redhat可以说是在国内使用最多的Linux版本。这个版本的特点就是使用人数多，资源多。
+**CentOS**: CentOS的稳定性非常好，适合于服务器使用。
+**Fedora**： Fedora Core的稳定性较差，最好只用于桌面应用
+**Manjaro**：比较特别的一种发行版本，基于 Arch Linux 。 Manjaro 几乎为所有的程序都提供了桌面环境和窗口管理界面。
+Linux发行版本有许多，对于新手的确是两眼一抹黑地挑，这里一个知乎的回答或许可以有点启发 ：[如何选择适合自己的Linux发行版本](https://www.zhihu.com/question/21411365)
+
+另外，可以用 `lsb_release -a`查看发行版本型号
+```bash
+(base) [openbiox01@z root]$ lsb_release -a
+LSB Version:    :core-4.1-amd64:core-4.1-noarch
+Distributor ID: CentOS
+Description:    CentOS Linux release 7.3.1611 (Core)
+Release:        7.3.1611
+Codename:       Core
+```
+#### Manjaro Deepin Linux 是一个什么样的存在？
+Manjaro-deepin是以manjaro为基础的***桌面系统***。外观精美，但是Manjaro的软件安装方式会跟Debian系列和CentOS的不同。
+ [Manjaro-deepn安装指南](https://zhuanlan.zhihu.com/p/43442012)
+
+#### 什么是 Linux 系统的内核，如何查看内核版本号？
+　Linux内核［kernel］是整个操作系统的最底层，它负责整个硬件的驱动，以及提供各种系统所需的核心功能。在内核基础上挂载不同软件便构成操作系统，Ubuntu、RedHat、Fedora、Debian等都是基于Linux内核(版本号可能不同)的不同操作系统。
+方法一，用`cat/proc/version`：
+```bash
+(base) [openbiox01@izuf6btm1dq2w64mt5q889z root]$ cat /proc/version
+Linux version 3.10.0-514.26.2.el7.x86_64 (builder@kbuilder.dev.centos.org) (gcc version 4.8.5 20150623 (Red Hat 4.8.5-11) (GCC) ) #1 SMP Tue Jul 4 15:04:05 UTC 2017
+
+```
+方法二，用`uname -a`
+```bash
+(base) [openbiox01@izuf6btm1dq2w64mt5q889z root]$ uname -a
+Linux izuf6btm1dq2w64mt5q889z 3.10.0-514.26.2.el7.x86_64 #1 SMP Tue Jul 4 15:04:05 UTC 2017 x86_64 x86_64 x86_64 GNU/Linux
+```
+### 关于Linux安装和配置
+
+#### 如何组装服务器和安装Linux系统
+
+#### 在 Linux 下如何查看电脑的硬件信息（如内存、CPU、硬盘、显卡等）
+
+ - `cat /proc/cpuinfo`  查看CPU 的详细信息
+ - `free -m` 查看内存
+ - `lsblk` 查看硬盘和分区
+ - `lspci | grep -i vga` 查看显卡信息
+
+
+#### Linux 系统常见的文件系统有哪几种？Windows系统上看到的C盘、D盘，在Linux 系统下是以什么样的形式存在？
+ 
+ 1.Linux系统因为使用VFS，所有其核心可以支持如ext、ext2、ext3、ext4、JFS2等的多种的文件系统。
+ 2.Linux采用目录形式来代替windows中硬盘分区的概念，所以没有C/D盘。Windows有不同的分区，同时目录都存于分区上。linux则通过**加载**的方式把所有分区都放置在 'root' 下制定的目录里。
+#### Linux 系统如何设置开机自动挂载（mount）你的移动介质（如U盘、移动硬盘）
+使用修改`fstab`文件的方法配置自动挂载：
+`/etc/fstab`是在开机引导的时候自动挂载到linux的文件系统。
+首先可以用`fdisk -l`查看挂载信息：
+```bash
+[root@izuf6btm1dq2w64mt5q889z ~]# fdisk -l
+
+Disk /dev/vda: 42.9 GB, 42949672960 bytes, 83886080 sectors
+Units = sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk label type: dos
+Disk identifier: 0x0008de3e
+
+   Device Boot      Start         End      Blocks   Id  System
+/dev/vda1   *        2048    83884031    41940992   83  Linux
+```
+查看`fstab`文件内容
+```bash
+[root@izuf6btm1dq2w64mt5q889z ~]# cat /etc/fstab
+#
+# /etc/fstab
+# Created by anaconda on Fri Aug 18 03:51:14 2017
+#
+# Accessible filesystems, by reference, are maintained under '/dev/disk'
+# See man pages fstab(5), findfs(8), mount(8) and/or blkid(8) for more info
+#
+UUID=59d9ca7b-4f39-4c0c-9334-c56c182076b5 /                       ext4    defaults        1 1
+```
+然后用`vim /etc/fstab`编辑文件，在最后一行加上挂载信息，比如：
+```bash
+/dev/sdb1 /mnt/usb1 ntfs-3g defaults 0 0	#这里添加了一个NTFS
+```
+保存退出即可。
+
+### 关于 Linux 的目录和文件
+
+#### 什么是“根目录“、“家目录”？
+Linux的文件系统是一个树状发展目录结构，“根目录”是最顶层的目录用`/`。而“家目录”一般在根目录下的`/home`里，不同的用户登陆之后进入的是各自的“家”。
+
+#### 简述文件的绝对路径和相对路径
+
+举个栗子，比方说我现在在`bisoft`这个文件夹下属的 `R`文件夹里，我的目的地是：
+```
+ /home/openbiox01/biosoft/spack/opt/spack/
+```
+所谓“绝对路径”，就是无论我身处哪个位置，只要输入绝对路径就可以去到目的地。
+```bash
+ cd /home/openbiox01/biosoft/spack
+ ```
+所谓“相对路径”，是以“我目前所处的位置”所谓参照点，我只需要往上走一层目录到达`bisoft`就可以再进入`spack`了。
+ ```bash
+ cd ..
+ cd spack
+ ```
+#### Linux 系统在根目录（/）下一般会有哪些目录，它们分别有什么作用？
+A:
+- home：普通用户的工作目录
+
+- misc：储存一些特殊字符的定义
+
+- root：root用户的工作目录
+
+- bin：存放常用命令
+
+- mnt：默认的挂载软驱和光驱的目录
+
+- sbin：要具有一定权限才能使用的命令
+
+- tmp：公用的临时文件存储点
+
+- boot：存放引导相关的文件
+
+- lib：系统最基本的动态链接共享库
+
+- net：存放和网络相关的文件
+
+- usr：存放应用程序和文件
+
+- dev：设备文件
+
+- opt：给源码安装软件时选择的安装目录位置
+
+- srv：系统启动服务时可以访问的数据库目录
+
+- var：存放一些经常变化的数据
+
+- etc：存放与配置相关的文件
+
+- media：存放可移除设备，如：软盘、光盘
+
+- proc：虚拟目录，是内存的映射
+
+- sys：管理设备文件
+
+[参考内容](https://blog.csdn.net/zwt0112/article/details/53067567)
+
+#### 如何查看隐藏文件
+在linux中以`.`开头的都是隐藏文件。可以通过`ls -a`查看隐藏文件。
+
+#### Linux 系统中的 644、755、777 文件权限分别表示什么意思？他们的数字是怎么计算得来的？修改文件权限的命令是什么？怎么设置用户文件的默认权限？如何批量修改某个目录下的目录权限为755，文件权限为644？
+##### 文件权限的计算
+在Linux中，不同用户对于同一个文件的所拥有的文件权限有可能是不同的。
+当我们用 `ls -l`查看时，发现不同的文件最前面都会显示一串由10个字符的代码,比方说下面的 `-rw-rw-r--`
+```bash
+(base) [openbiox01@izuf6btm1dq2w64mt5q889z data01_train]$ ls -l
+total 108
+-rw-rw-r-- 1 openbiox01 openbiox01 104931 Nov 12  2016 rmDuplicate.zip
+-rw-rw-r-- 1 openbiox01 openbiox01   3099 May 18  2017 test.bed
+```
+第一个字符代表文件的类型：属于普通文件还是目录还是链接文件等。
+往后9个字符每3个为一组，分别代表了不同组别用户对这个文件的读取（r)/写入(w)/执行(x)权限.
+这些操作权限同时可以用数字来表示：
+	
+    r=4
+    w=2
+    x=1
+因此，如果某个文件的文件权限是`-rwxrw-r‐-`那么就可以作以下换算：
+
+	第一组：rwx  4+2+1 =7 #文件所有者用户，可读可写可执行
+    第二组：rw-  4+2   =6 #与文件所有者同组用户，可读可写不可执行
+    第三组：r--  4        #与文件所有者不同组用户，可读不可写不可执行
+这个文件的文件权限为 764。644，755，777数字可以此类推。
+##### 文件权限的修改
+使用`chmod`命令来更改权限。
+`chmod 644  file`
+```bash
+[openbiox01@izu data01_train]$ ls -l #查看文件权限
+total 108
+-rw-rw-r-- 1 openbiox01 openbiox01 104931 Nov 12  2016 rmDuplicate.zip
+-rw-rw-r-- 1 openbiox01 openbiox01   3099 May 18  2017 test.bed
+[openbiox01@izu data01_train]$ chmod 644 test.bed #修改test.bed的文件权限
+[openbiox01@izu data01_train]$ ls -l #检查修改情况
+total 108
+-rw-rw-r-- 1 openbiox01 openbiox01 104931 Nov 12  2016 rmDuplicate.zip
+-rw-r--r-- 1 openbiox01 openbiox01   3099 May 18  2017 test.bed #权限已修改
+
+```
+批量修改可以用 `chmod -R 权限数字 文件/文件夹名`
+```bash
+[openbiox01@izuf6btm1dq2w64mt5q889z ~]$ chmod -R 777 data01_train/
+[openbiox01@izuf6btm1dq2w64mt5q889z ~]$ cd data01_train/
+[openbiox01@izuf6btm1dq2w64mt5q889z data01_train]$ ls -l
+total 108
+-rwxrwxrwx 1 openbiox01 openbiox01 104931 Nov 12  2016 rmDuplicate.zip
+-rwxrwxrwx 1 openbiox01 openbiox01   3099 May 18  2017 test.bed
+```
+
+#### `rsync`，`scp` 都可以用来在服务器之间传输文件，它们的主要区别是什么？
+
+简单来说，`scp`基于ssh，其本质是复制，当文件修改后还是把所有文件复制过去，`rsync` 可以通过自有协议，以一个daemon形式运行指定监听端口来进行文件传输，当文件修改后，只把修改的文件同步过去即可。
+这两种传输方法之间更多的区别和使用可以参考下面：
+[rsync和scp](用rsync来替代scp)
+
+### 关于vim
+
+#### 在命令行界面，如何用 Vim 编辑器打开一个文本文件、创建一个文件、对文件进行修改和保存？
+
+ 
+   ```bash
+   touch filename	#创建文件
+   vim filename 	#用vim打开文件
+   # 按 i 是编辑器进入 insert 状态后编辑文件；
+   # 按 	Esc 推出编辑状态
+   # 按 ：，输入 wq保存并退出。
+```
+#### 如何设置 Vim 编辑器，使其支持：a) 文件/目录路径提示和自动补全; b) Python 函数自动补全；c) 左侧显示目录树；d) 各种文件的语法高亮
+a) `Ctrl+n `自动补全路径
+b)可以安装`pydiction`插件。
+c)可以安装vim的 Nerdtree 插件。
+ 下载对应的Nerdtree。在vim中用` :NERDTree`打开，关闭时按` q` 即可。
+d)设置高亮：
+	1.直接在vim 中开启高亮 `synax on`
+
+
+#### 跟nano相比，vim的优势在哪里？在vim里，p 与 P 两种指令下粘贴的效果有什么区别？
+vim基本编辑操作更强大，可以用最简单的按键实现光标移动、文本复制粘贴。最重要是对比nano，有更多的开发语言和软件支持vim。
+在vim中`p`是粘贴在光标后，而`P`是粘贴在光标位置。
+#### 在vim中，编辑完文件后显示 E45: 'readonly' option is set 时，如何强制写入该档案并保存退出？
+用`wq!`强制保存并退出。
+### 关于 `grep`
+
+#### 管道在 Shell 中是一个什么样的角色？（未解决）如何使用管道将上游的数据传入 Vim 编辑器？
+通过管道符`命令1 | 命令2 | 命令3`的格式，shell中的命令可以将标准输入读取数据，还能将这些数据送到标准输出中去。
+#### 如何将程序的 stdout 和 stderr 通过管道输出到两个文件？
+`cmd 1> file1` 把 stdout 重定向到 file1 文件中
+`cmd 2> file2` 把 stderr 重定向到 file2 文件中 
+### 关于用户和权限设置
+#### 如何新增一个用户并赋予该用户root权限？
+```bash
+adduser user1 #新增用户
+passwd user1 #设置密码
+```
+#查看/etc/sudoers 文件
+```bash
+cat /etc/sudoers
+```
+找到以下内容
+```bash
+## Allow root to run any commands anywhere
+root    ALL=(ALL)       ALL
+```
+编辑/etc/sudoers 文件
+```bash
+vim /etc/sudoers
+## Allow root to run any commands anywhere
+root    ALL=(ALL)       ALL
+user1	ALL=(ALL)       ALL
+```
+保存退出即可。
+#### 如何使用ROOT权限？如何切换不同的身份
+A:
+ - 在root时，通过`sudo`命令使用root权限。用`su - username`切换到普通用户
+ - 在普通用户状态下用`su -`切换成root账号，需要密码。
+ - 对于具有root权限的一般用户，用`sudo su`转换成root权限状态，需要密码。用`su username`切换回一般状态
+
+### 关于shell
+#### Linux 文件操作时，比较 awk/grep/sed 三剑客的用法
+文本处理三剑客grep-sed-awk
+`grep` 命令主要用于文本内容的查找。命令格式有两种：
+
+第一种`grep [option] pattern filename`
+第二种`filename |grep pattern`
+
+`sed`命令主要用于文本内容的编辑。基本是是针对一行行数据来进行处理的，最常用于文本替换。命令格式为：
+`sed [option] 'command' filename`
+比如要把文本中的a替换成t,可以用:
+`sed 'a/oldstring/newstring/t' filename `
+
+`awk`就是对文件进行逐行的读入，以空格为默认分隔符将文本中每行切片，切开的部分再进行各种分析处理。还可以对处理的数据需要生成报告之类的信息。并且，处理的数据是**按列**进行处理的，最好使用awk。
+命令格式是`awk [-F field-separator] 'commands' input-file(s)`
+举个例子：以”；”分隔text文本的每一行并且打印第一列:
+```bash
+awk -F ';' '{print $1}' text
+```
+<!--备注：生信技能书在B站上的Linux课程第6课中有关于这三个命令的生信实例教程-->
+#### Linux 系统中哪个文件是黑洞，可以吃掉 Shell 管道中流动的信息
+A: `/dev/null`
+#### 如果输入的shell脚本过长，快速删除有哪些快捷键呢？如何快速调整光标位置
+A：
+删除字符：
+ - `Ctrl+l` 清理屏幕
+ - `Ctrl+U` 向前删除直到行首(整行删除)
+ - `Ctrl+W` 执行向前删除，直到前一个字符是空格
+ 
+调整光标位置：
+ - `Ctrl+a` 移动到当前行的开头
+ - `Ctrl+e` 移动到当前行的结尾
+
+
+### 关于WSL
+
+#### 在 Win10 自带的子系统下运行 Ubuntu，和独立使用 Ubuntu 系统，前者的优缺点如何？
+优点：免除了Linux繁琐的安装过程
+缺点：很多命令都没有安装，很多配置都有不一样，而且目前网络上关于WSL一些教程也远不及正统Linux系统的教程多，遇到问题很可能解决不了。但是对于初学者学习一下基本命令和代码还是很方便的。
+#### （未解决）Windows 子系统（WSL）的安装目录如何从迁移？
+#### WSL 如何使其目录保持755，文件保持644权限？ 
+按下面方法修改：
+WSL 目录下的文件
+在`.profile`或`.zshenv`或中加入：
+```bash
+if [[ "$(umask)" == '000' ]]; then
+    umask 022
+fi
+```
+Windows 目录下的文件
+在`/etc/wsl.conf`中加入（如果文件不存在，就新建一个）：
+```bash
+[automount]
+enabled = true
+root = /mnt/
+options = "metadata,dmask=022,fmask=133"
+mountFsTab = false
+```
+参考：[WSL 中的文件权限设置 ](https://qifei9.github.io/2018/wsl-file-permission.html)
+#### (未解决）在 Windows 桌面环境直接编辑 WSL 内的目录和文件（自动挂载的目录和文件除外）有什么后果？
+### 其他
+#### 什么是 X server?
+A: `X server`是Linux系统里面图形接口服务器的简称。当需要Linux提供界面的时候，系统就会建立一个或者数个X server，通过X协议跟窗口管理器交互，由独立于系统的应用程序来产生窗口，状态栏，按钮之类的交互界面。
+#### Centos 系统如何开放指定端口的入和出的访问？
+编辑` /etc/sysconfig/iptables `文件
+如果要开放80端口，可以在默认的22端口下加入
+```bash
+-A INPUT -m state –state NEW -m tcp -p tcp –dport 80 -j ACCEPT
+```
+保存后重启防火墙：
+```bash
+/etc/init.d/iptables restart 
+```
+#### Centos 和 Ubuntu 系统如何查看当前服务器的 IP地址和 MAC 地址?
+
+使用命令： ` ifconfig -a`
+
+
+
+#### Centos 和 Ubuntu 系统如何查看即时网速？
+下载`iptraf`
+```bash
+yum install iptraf
+iptraf-ng   
+```
+注意要把你的终端软件放大，否则会报错：
+```bash
+[root@izuf6btm1dq2w64mt5q889z openbiox01]# iptraf-ng
+fatal: This program requires a screen size of at least 80 columns by 24 lines
+Please resize your window
+```
+
+####（未解决） 如果你没有买域名，如何在本地模拟某个域名的访问？
+可参考经验：[配置虚拟域名&让别人访问自己本地的项目](https://blog.csdn.net/dream_188810/article/details/78316452)
+#### 如何查看并设置当前环境的语言？en_us.utf-8和zh_cn.utf-8分别代表什么？
+```bash
+echo $LANG #查看语言
+LANG=语言名称 #设置语言
+```
+en_US.UTF-8下系统的菜单、程序的工具栏语言、输入法默认语言就都是英文的。 
+zh_CN.UTF-8下系统的菜单、程序的工具栏语言、输入法默认语言就都是中文的。
+虽然都是UTF-8，但是在不同国家和地区可能需要设置不一样的语言。
+
+## 编程题
+### 使用 bash 实现一个函数，输入整数 n，得到 1 到 n 的累加和
+```bash
+read -p "Input n: " n
+sum=0
+i=1
+while (($i<=$n));do
+sum=$(($sum +$i))
+i=$(($i+1))
+done
+echo $sum
+```
+#### 通过 Shell 命令提取 gtf 中编码基因的 gene symbol 和 gene id
+
+#### 假设有如下文件“sample.txt"，文件中包含有若干列重复列。请保留一列重复列，并不影响列顺序。
+```bash
+COL1,COL2,COL3,COL1,COL4,COL2
+1,2,3,1,4,2
+a1,a2,a3,a1,a4,a2
+b1,b2,b3,b1,b4,b2
+d1,d2,d3,d1,d4,d2
+```
+变为
+```bash
+COL1,COL2,COL3,COL4
+1,2,3,4
+a1,a2,a3,a4
+b1,b2,b3,b4
+d1,d2,d3,d4
+```
+**基本思路是使用`awk`命令**
+```bash
+(base) [openbiox01@izuf6btm1dq2w64mt5q889z Linux_exam]$ cat sample.txt
+COL1,COL2,COL3,COL4
+1,2,3,4
+a1,a2,a3,a4
+b1,b2,b3,b4
+d1,d2,d3,d4
+(base) [openbiox01@izuf6btm1dq2w64mt5q889z Linux_exam]$ awk -F, 'NR==1{
+>         for(i=1;i<=NF;i++)	
+>                 if(!($i in v)){v[$i];t[i]}
+>         }
+>         {s=""
+>         for(i=1;i<=NF;i++)
+>                 if(i in t)
+>                         s=s sprintf("%s,",$i)
+>                         if(s){
+>                                 sub(/,$/,"",s)
+>                                 print s
+>                         }
+>         } ' sample.txt > output.txt
+>         #只是以第一行的重复值为标准删除列
+(base) [openbiox01@izuf6btm1dq2w64mt5q889z Linux_exam]$ cat output.txt
+COL1,COL2,COL3,COL4
+1,2,3,4
+a1,a2,a3,a4
+b1,b2,b3,b4
+d1,d2,d3,d4
+```
+有些参数还不是很懂，只是照葫芦画瓢，需要再仔细理解。
+参考：[1](https://www.linuxidc.com/Linux/2012-06/63687.htm);[2](https://stackoverflow.com/questions/15854720/deleting-duplicate-columns-from-csv-file)
+#### （未解决）使用 bash 编程实现时间戳功能，如下为 ngsjs 的 rtime_stamp 命令行程序（R语言）输出
+```bash
+$ rtime_stamp
+[[1]]
+[1] "2019_04_03_18_53_44_" "2019_04_03_18_53_"    "2019_04_03_18_"
+[4] "2019_04_03_"          "2019_04_"             "2019_"
+
+[[2]]
+[1] "2019-04-03-18-53-44-" "2019-04-03-18-53-"    "2019-04-03-18-"
+[4] "2019-04-03-"          "2019-04-"             "2019-"
+
+[[3]]
+[1] "2019/04/03/18/53/44/" "2019/04/03/18/53/"    "2019/04/03/18/"
+[4] "2019/04/03/"          "2019/04/"             "2019/"
+
+$ rtime_stamp -r 'x[[1]]'
+2019_04_03_18_56_55_
+2019_04_03_18_56_
+2019_04_03_18_
+2019_04_03_
+2019_04_
+2019_
+
+$ rtime_stamp -r 'x[[1]][1]'
+2019_04_03_18_57_18_
+```
+答：未解决。
+基本思路：bash里的时间戳功能是通过`date -d now +%s #时间转成时间戳`这样的语句来转换的
+```bash
+[openbiox01@izu home]$ date -d now +%Y%m%d # %+相应的字母用来设置不同的时间域，比如秒分时年月日等。
+20190414
+
+[openbiox01@izu home]$ date -d now +%Y_%m_%d #修改不同时间域的连接符
+2019_04_14
+
+```
+
+---
+#### 尝试使用源码编译安装最新版本的 R，记录过程中遇到的问题。同时使用系统自带的包管理器（如 centos 的yum；Debian/Ubuntu 的 apt；arch、manjaro 的 pacman）、conda 和 spack 安装相同版本的 R。
+##### 源码编译安装R 
+
+这次安装遇到很多问题，查询了很多别人的安装教程，但主要为我解决关键性问题的有一下两个。
+
+[史上最麻烦的linux下R源码安装](https://www.jianshu.com/p/edb234eed915)
+[Installing R on Linux](https://stackoverflow.com/questions/38690232/installing-r-on-linux-configure-error-libcurl-7-28-0-library-and-headers-a)
+
+首先下载R
+```bash
+wget https://mirrors.tuna.tsinghua.edu.cn/CRAN/src/base/R-3/R-3.5.3.tar.gz
+```
+解压文件
+```bash
+tar -zxvf R-3.5.3.tar.gz 
+```
+配置
+```bash
+cd R-3.5.3  #进入解压的文件
+./configure
+```
+**第一次报错**
+```bash
+configure: error: --with-readline=yes (default) and headers/libs are not available
+```
+查了一下，发现需要安装`readline`。于是：
+```bash
+yum install readline-devel
+./configure --with-readline=no 
+```
+**第二次报错**
+```bash
+configure: error: --with-x=yes (default) and X11 headers/libs are not available
+```
+继续查，发现需要安装 `libX11-devel`和`libXt-devel`
+```bash
+yum install libX11-devel 
+yum install libXt-devel 
+```
+也有说可以设置`./configure --with-readline=no --with-x=no`
+
+继续配置，**第三次报错**
+```bash
+configure: error: libcurl >= 7.22.0 library and headers are required with support for https
+```
+好吧，这次是没有安装`libcurl`
+下载安装编译：
+```bash
+wget https://curl.haxx.se/download/curl-7.61.0.tar.gz
+tar -zxvf curl-7.61.0.tar.gz
+cd curl-7.61.0/
+./configure
+make
+make install
+```
+继续`./configure --with-readline=no --with-x=no`
+**第四次报错**
+```bash
+configure: error: libcurl >= 7.22.0 library and headers are required with support for https
+```
+一样的错误。再查询发现还需要安`libcurl-devel`
+ok,那就继续安装：
+```bash
+yum install libcurl-devel
+```
+GO ON
+```bash
+./configure --with-readline=no --with-x=no	#继续编译,无报错但是有一个warning.
+make
+make install
+```
+Finally!
+```bash
+
+[root@izuf6btm1dq2w64mt5q889z openbiox01]# R
+
+R version 3.5.2 (2018-12-20) -- "Eggshell Igloo"
+Copyright (C) 2018 The R Foundation for Statistical Computing
+Platform: x86_64-redhat-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+```
+
+###### 用 yum 安装
+在CentOS中，用`yum`下载软件可以解决很多问题，最大的好处就是会自动分析你要安装的软件的依赖关系，并会自动帮你安装必须的“依赖软件”。如如说在上面“源码编译方法”中遇到的报错，用`yum`时统统没有出现，并且还不需要配置环境，不需要编译，简直是新手友好。
+
+首先在EPEL中下载R
+```bash
+yum install epel-release	#R已经被EPEL仓库管理着，EPEL是一个汇集了各种附加软件包的项目
+yum install R
+```
+安装过程不长，完成后不需要编译直接输入`R`，检查安装成功！
+
+##### 用conda安装
+
+**首先要安装`conda`**
+
+通过`wget`命令下载miniconda：
+```bash
+wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh
+```
+下载完后进行安装：
+```bash
+bash Miniconda-latest-Linux-x86_64.sh	#`bash` 命令安装软件？
+```
+输入yes确定后还要`source`一下
+```bash
+source ~/.bashrc
+```
+到此为止，`conda`已经顺利安装上了。可以直接输入 
+```bash
+conda
+```
+安装R，一步到位，无需手动编译：
+```bash
+conda install R
+```
+会自动开始安装所需要的文件
+```bash
+(base) [openbiox01@izuf6btm1dq2w64mt5q889z biosoft]$ conda install R
+WARNING: The conda.compat module is deprecated and will be removed in a future release.
+Collecting package metadata: done
+Solving environment: done
+
+## Package Plan ##
+
+  environment location: /home/openbiox01/miniconda2
+
+  added / updated specs:
+    - r
+
+
+The following packages will be downloaded:
+
+    package                    |            build
+...
+...
+...
+
+```
+最后也是直接在终端输入`R`确认安装成功。
+
+##### （未完成）用spack安装
+安装 spack `git clone https://github.com/spack/spack.git` 
+```bash
+(base) [openbiox01@izuf6btm1dq2w64mt5q889z biosoft]$ git clone https://github.com/spack/spack.git
+Cloning into 'spack'...
+remote: Enumerating objects: 153179, done.
+remote: Total 153179 (delta 0), reused 0 (delta 0), pack-reused 153179
+Receiving objects: 100% (153179/153179), 53.26 MiB | 202.00 KiB/s, done.
+Resolving deltas: 100% (72024/72024), done.
+(base) [openbiox01@izuf6btm1dq2w64mt5q889z biosoft]$ ls	#查看文件
+curl-7.61.0                             Miniconda2-latest-Linux-x86_64.sh
+curl-7.61.0.tar.gz                      R-3.5.3
+libcurl-7.29.0-51.el7.x86_64.rpm        R-3.5.3.tar.gz
+libcurl-devel-7.29.0-51.el7.x86_64.rpm  spack
+(base) [openbiox01@izuf6btm1dq2w64mt5q889z biosoft]$ cd spack/bin/
+(base) [openbiox01@izuf6btm1dq2w64mt5q889z bin]$ ./spack install libelf
+==> Installing libelf
+==> Searching for binary cache of libelf
+==> Warning: No Spack mirrors are currently configured
+==> No binary for libelf found: installing from source
+==> Fetching https://fossies.org/linux/misc/old/libelf-0.8.13.tar.gz
+######################################################################## 100.0%
+==> Staging archive: /home/openbiox01/biosoft/spack/var/spack/stage/libelf-0.8.13-qzhgthw73zajntobm3f7ndhl5c3eiene/libelf-0.8.13.tar.gz
+==> Created stage in /home/openbiox01/biosoft/spack/var/spack/stage/libelf-0.8.13-qzhgthw73zajntobm3f7ndhl5c3eiene
+==> No patches needed for libelf
+==> Building libelf [AutotoolsPackage]
+==> Executing phase: 'autoreconf'
+==> Executing phase: 'configure'
+==> Executing phase: 'build'
+==> Executing phase: 'install'
+==> Successfully installed libelf
+  Fetch: 4.98s.  Build: 11.30s.  Total: 16.28s.
+[+] /home/openbiox01/biosoft/spack/opt/spack/linux-centos7-x86_64/gcc-4.8.5/libelf-0.8.13-qzhgthw73zajntobm3f7ndhl5c3eiene
+```
+在[basic usage](https://spack.readthedocs.io/en/latest/basic_usage.html)里找可安装的包
+
+但是后面安装出现了一些报错，需要继续查阅
+```bash
+(base) [openbiox01@izuf6btm1dq2w64mt5q889z bin]$ ./spack install r
+...
+...
+curl: (7) Failed to connect to mirrors.nju.edu.cn port 443: Connection timed ou                                                                t
+==> Fetching from https://ftpmirror.gnu.org/gdbm/gdbm-1.18.1.tar.gz failed.
+==> Error: FetchError: All fetchers failed for gdbm-1.18.1-dv2qksj2dheh7hzmu7if                                                                tqhxlkqrinwt
+
+/home/openbiox01/biosoft/spack/lib/spack/spack/package.py:965, in do_fetch:
+        962                raise FetchError("Will not fetch %s" %
+        963                                 self.spec.format('$_$@'), ck_msg)
+        964
+  >>    965        self.stage.create()
+        966        self.stage.fetch(mirror_only)
+        967        self._fetch_time = time.time() - start_time
+        968
+
+```
+##### (未完成) 使用 spack 在指定不同版本的 gcc 编译器（如8.3、5.4 和 4.8）情况下安装最新版本的R。并比较一些 R 基础函数的速度在计算较大数据量时是否有变化。
+
+参考资料：
+
+- [Spack Pakcage Manager](https://pi.sjtu.edu.cn/doc/spack/)
+- [A flexible package manager that supports multiple versions](https://github.com/spack/spack)
+
