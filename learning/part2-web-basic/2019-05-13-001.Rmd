@@ -1,0 +1,979 @@
+---
+title: "Question about web service development"
+author: "Kai Liao, Shixiang Wang, Qingbo Zhao, Liang Wu, Jinzeng Wang, Jianfeng Li"
+date: '2019-05-13'
+output:
+  prettydoc::html_pretty:
+    highlight: github
+    theme: hpstr
+    toc: yes
+slug: 002-web-basic
+tags:
+- web
+- git
+- sql
+categories: playcloud
+---
+
+```{r, echo = FALSE}
+knitr::opts_chunk$set(comment = "#>", collapse = TRUE)
+options(stringsAsFactors = F)
+
+```
+
+## 简答题
+
+### 1.列举一些开源的云计算管理平台项目
+
+- OpenStack
+- AbiCloud 
+- Eucalyptus 
+- 10gen MongoDB 
+- Enomalism 
+- Nimbus
+
+**参考资料：**
+
+- <https://blog.csdn.net/iteye_18139/article/details/81957687>
+- <https://blog.csdn.net/qq_35624642/article/details/77649768?locationNum=10&fps=1>
+
+### 2. 云服务提供商提供的服务器安全组有什么用？
+
+安全组是一种虚拟的防火墙，具备状态检测和数据包过滤功能，用于在云端划分安全域。主要用于控制云无服务器实例的外网和内网访问请求权限，通过配置安全组规则，允许或禁止安全组内的 ECS 实例对公网或私网的访问。
+
+安全组可以建立多个，而且可以同时应用于不同云服务器。对于网络安全有较高要求的，建议只开放 80/443 端口，并对 22 端口设置一些安全措施，防止远程登录账号和密码被暴利破解。
+
+新购置的服务器一般需要进行相关配置后方可通过外网访问云服务器特定端口，如网页（WWW）服务端口：80/443；MySQL 数据库端口：3306；FTP 服务端口：21；SSH/SFTP 服务端口；22；RStudio server：8787；Shiny server：3737；windows 服务器远程桌面端口：3389。
+
+如果你的云服务器开放了对应的服务（如开启了 RStudio server），但是通过网络却没有任何响应，那么你在确认服务进程已经正常启动之后，则需要进一步确定安全组是否正确设置。此外，除了安全组的设置之外，另外一个无法访问云服务器的原因之一是一些国内的云厂商对于未进行 [ICP备案](http://www.beian.miit.gov.cn) 的服务器会进行网络资源拦截，你需要在线完成相关备案手续后开放你的云服务器网络访问。
+
+补充：云服务器的外网主要是指通过服务器外部网络/公共网络进行访问。内网则主要指在同一个云服务器提供商的内部网络进行连接，数据传输速度一般远远快于外网。
+
+**参考资料：**
+
+- <https://cloud.tencent.com/document/product/213/12452>
+- <https://help.aliyun.com/document_detail/25387.html>
+- <https://www.tpyyes.com/a/linux/2017/1121/393.html>
+
+### 3. 为什么阿里云在国内的市场占有率要远远超过其他的几家厂商？
+
+最重要的原因之一：先发优势。同时也有阿里系众多资源的整合和支持。另外，阿里的服务器确实做的还可以：高可用性、安全性和弹性。
+
+国外知名云厂商亚马逊 AWS 最早于 2006 年开始以 Web 服务的形式为企业提供 IT 基础设施，即云服务，现在基本占据了全世界 51% 的份额。阿里云创立于 2009 年，是国内最早提供云服务的厂商之一。当时，国内其他厂商在短期内并未看到盈利的可能，迟迟未进行跟进。而当现在云服务成为潮流之后，有更多资源和技术积累的阿里云自然成为了中国最大的云厂商。
+
+最新的市场份额调查结果：
+
+> 全球云服务器市场排名第一位的是亚马逊 AWS，占全球份额的 51.8%；微软 Azure 云服务位列第二位，占据 13.3% 的份额；阿里巴巴的阿里云位列第三位，占比 4.6%；谷歌 Cloud 云服务站据 3.3%；随后是 IBM，占比1.9%
+> 国内市场份额：阿里云市场份额占 45.5%，排名第一营收 11.12 亿美元，腾讯云市场份额 10.3%，排名第二营收 2.51 亿美元，中国电信老三，份额7.6%，营收 1.85 亿美元(IDC 中国数据)。其它市场份额就相对靠后了。
+
+这个问题的启示：
+
+- 创新是第一生产力，在某个极具发展前景的产品市场还是初期的时候进行布局和积累对于在中前期获得更多市场份额至关重要。
+- 在获得相关市场份额优势之后，如果没有持续的迭代和更新，以及顺应时代的潮流的变革和更新。就算可以在一时获得最大的市场份额，但是随着时间的流逝也可能南柯一梦，最终溟灭于岁月的涛涛激流：柯达、诺基亚、微软 IE。
+
+**参考资料：**
+
+- <https://www.ithome.com/0/397/578.htm>
+- <https://www.zhujib.com/2018yunfuwushichang.html>
+- <https://help.aliyun.com/document_detail/51704.html?spm=a2c4g.11186623.6.543.49106fffUaKyuM>
+
+### 4. HTML 是一种编程语言吗？
+
+HTML 为 HyperText Markup Language 的缩写，中文翻译为超文本标记语言，它是一种用于创建网页的标准标记语言，即纯文本加上一些有特殊含义的标签。因此，它不是一种编程语言。
+
+**参考资料：**
+
+- <https://www.runoob.com/html/html-tutorial.html>
+
+### 5. HTML、CSS、JavaScript 三者之间的关系是什么？
+
+HTML 定义了页面的内容，CSS 来控制页面元素的样式，而 JavaScript 负责页面的交互逻辑。
+
+**参考资料：**
+
+- [廖雪峰的Python教程](https://www.liaoxuefeng.com/wiki/1016959663602400)
+
+### 6. 简述 HTML、XHTML 和 XML的异同
+
+- HTML：HyperText Markup Language / 超文本标记语言
+- XHTML: Extensible Hypertext Markup Language / 可扩展超文本标记语
+- XML: Extensible Markup Language / 可扩展标记语言
+
+从字面可以看出，三者都是ML，也就是都是标记语言（Markup Language），所以区别主要在前面部分。
+
+HTML（Hypertext Markup language）
+
+-	超文本标记语言是用来描述和定义网页内容的标记语言，是构成网页的最基本的东西。所谓超文本，就是说它除了能标记文本，还能标记其他的内容，比如：图片，链接，音频，视频等。HTML是宽松的，不严格的web语言，哪怕大小写混用，标签不闭合，浏览器都能以自己的方式读取（有可能误解），不会出现报错。
+
+XML（Extensible Markup Language）
+
+-	可扩展标记语言，是用来存储数据结构的语言，就是给一个文档加一堆标签，说明每段文字是干什么的，有什么意义。这样做的目的是方便存储、传输、分享数据，人和计算机都可以很方便的阅读。XML 和 HTML 有一个明显的区别就是：HTML 的标签都是预定义的，你不可以自己随便增加，比如你不能自造一个标签叫 <openbiox>, 但是 XML 可以。此外XML是严格的语言，因为如果书写的标签不规范，存储数据就会出问题。
+
+XHTML（Extensible Hypertext Markup Language）
+
+-	可扩展超文本标记语言，HTML和XML 一结合，就产生了 XHTML，XHTML就是以XML的语法形式来写HTML。它类似于HTML语言，不过它的语法是严格的，书写更加规范。它的来源是这样的：由于HTML语言不严格，比如大小可以混用，属性值随便你加不加引号，单引号还是双引号也随便你，犯一些小错误都没有关系，这对严谨的程序员来说是一件不可容忍的事，HTML 标准的制定者W3C组织就参考了XML的严谨的优点，将HTML严格规范化，推出了XHTML语言。所以也可以把XHTML理解为HTML的严格语法形式，除此之外，其它方面基本一样。
+
+**参考资料：**
+- <https://www.jianshu.com/p/412dbdd337ff>
+- <https://www.jianshu.com/p/8e65f98980bb>
+- <https://www.jianshu.com/p/9027f0b4c69c>
+
+### 7. 什么是 DOM?
+
+DOM 是 Document Object Model（文档对象模型）的缩写，DOM 是 W3C（万维网联盟）的标准。DOM 定义了访问 HTML 和 XML 文档的标准：W3C 文档对象模型 （DOM） 是中立于平台和语言的接口，它允许程序和脚本动态地访问和更新文档的内容、结构和样式
+
+**参考资料：**
+- <http://www.w3school.com.cn/htmldom/dom_intro.asp>
+- <https://www.zhihu.com/question/34219998>
+- <https://www.jianshu.com/p/2b4711525800>
+
+### 8. 现在的网页 HTML 文件一般会包含哪些 HTML 标签？
+
+- 头标签
+- 排版标签：`<p> <div> <hr> <br>`
+- 字体标签：`<h1> <font> <b> <u> <sup>`
+- 超链接
+- 图片标签
+- 等等
+
+**参考资料：**
+
+- <https://www.cnblogs.com/smyhvae/p/4850684.html>
+- <https://www.runoob.com/tags/html-reference.html>
+
+### 9. CSS 选择器有哪些？
+
+```
+.class 
+#id element [attribute] :link :visited :hover :before :after :first-child :last-child 
+```
+
+**参考资料：**
+- <https://www.runoob.com/cssref/css-selectors.html>
+
+### 10. Chrome，Safari，Firefox 如何查看网页源代码并快速定位元素？快捷键是什么？
+
+查看网页源代码：
+
+- Chrome: 鼠标右键 → View Page Source  
+- Safari: 鼠标右键 → Inspect Element 
+- Firefox: 鼠标右键 → View Page Source 
+
+三个浏览器的快捷键都是：option + command + u (macOS)  ctrl + u （windows）
+
+快速定位元素：
+
+- Chrome: option + command + i (macOS)  ctrl + shift + i、F12 (windows) 打开开发者工具，点击左上角的箭头图标。
+- Safari: option + command + i (macOS) 或者 alt + i (windows) 打开控制台，点击右上角的雷达图标。
+- Firefox: option + command + i (macOS)  ctrl + shift + i、F12 (windows) 打开控制台, 点击左上角的箭头图标。
+
+三个浏览器的快捷键都是：command + shift + c (macOS)  ctrl + shift + c (windows)
+
+**参考资料：** 
+
+- <https://developers.google.com/web/tools/chrome-devtools/>
+- <https://developer.mozilla.org/en-US/docs/Tools>
+- <https://developer.apple.com/safari/tools/>
+
+### 11. 有哪些常用的 Chrome 插件可以用于网页服务开发调试？
+
+- [FireShot](https://chrome.google.com/webstore/detail/take-webpage-screenshots/mcbpblocgmgfnpjjppndjkmgjaogfceg?hl=en-US)：Take Webpage Screenshots Entirely
+- [Vue DevTools](http://www.cnplugins.com/devtool/vuejs-devtools/)：Vue.js 调试
+- [React Developer Tools](http://www.cnplugins.com/devtool/react-developer-tools/)：React.js 调试
+- [jsonview](http://www.cnplugins.com/devtool/jsonview/)：Web 开发格式化和高亮插件
+- [Postman](http://www.cnplugins.com/devtool/postman/)：RESTful API 测试
+- [EditThisCookie](http://www.cnplugins.com/devtool/editthiscookie/)：Cookie 操作
+- [BuiltWith Technology Profiler](http://www.cnplugins.com/devtool/builtwith-technology-prof/)：网站技术解析工具
+- [github-awesome-autocomplete](https://github.com/algolia/github-awesome-autocomplete)：属于 GitHub 的 Alfred
+- [Page Ruler](https://chrome.google.com/webstore/detail/page-ruler/jlpkojjdgbllmedoapgfodplfhcbnbpn?hl=zh-CN)：网页尺寸标尺
+- [User-Agent Switcher for Chrome](https://chrome.google.com/webstore/detail/user-agent-switcher-for-c/djflhoibgkdhkhhcedjiklpkjnoahfmg?hl=zh-CN)：网页自适应测试工具
+- [SimilarWeb](https://chrome.google.com/webstore/detail/similarweb-website-rankin/hoklmmgfnpapgjgcpechhaamimifchmp)：查看网站各种流量数据
+- [IE Tab](https://chrome.google.com/webstore/detail/hehijbfgiekmjfkfjpbkbammjbdenadd)：模拟 IE 浏览器访问
+- [MeasureIt](https://chrome.google.com/webstore/detail/aonjhmdcgbgikgjapjckfkefpphjpgma)：量度页面上任意元素的尺寸
+- [Microstock Photo Power Search Tool](https://chrome.google.com/webstore/detail/ehipnpjjaejnoajfkkgonkhpkpiocekl)：搜索图片
+- [Palette for Chrome](https://chrome.google.com/webstore/detail/oolpphfmdmjbojolagcbgdemojhcnlod)：可以创建一个 16、24 或 32 调色板
+- [Web Developer](https://chrome.google.com/webstore/detail/bfbameneiokkgbdmiekhjnmfkcnldhhm)：一个全面的开发者工具
+- [WhatFont](https://chrome.google.com/webstore/detail/jabopobgcpjmedljpbcaablpmlmfcogm)：只需将鼠标悬停在一个文本，发现在使用的字体
+- [Speed Tracer](https://chrome.google.com/webstore/detail/bfbameneiokkgbdmiekhjnmfkcnldhhm)：网页 APP 性能相关
+- [xpath-helper](http://www.cnplugins.com/devtool/xpath-helper/)：Chrome 爬虫网页解析工具
+
+其他：掘金 Chrome 插件，AngularJS Batarang，ng-inspector for AngularJS，EnjoyCSS，LiveReload 等
+
+**参考资料：**
+
+- <http://www.cnplugins.com/zhuanti/12web.html>
+- <https://www.cnblogs.com/multistars/p/6524058.html>
+- <http://www.cnplugins.com/devtool/xpath-helper/>
+
+### 12. 目前常见的前端框架有哪些？分别罗列一些使用这些框架的生物信息学数据库/网页服务
+
+主流的网页服务前端框架：
+
+- [vuejs/vue](https://github.com/vuejs/vue)
+- [facebook/react](https://github.com/facebook/react)
+- [angular/angular](https://github.com/angular/angular)
+
+使用相关框架的生物信息学数据库和网页服务（待收集）：
+
+**angular**：
+
+- <http://oncokb.org/>
+
+### 13. HTML 元素和 Markdown 之间的对应关系
+
+HTML 是一种发布的格式，Markdown 是一种书写的格式。
+
+Markdown 的格式语法只涵盖纯文本可以涵盖的范围。不在 Markdown 涵盖范围之内的标签，都可以直接在文档里面用 HTML 撰写。不需要额外标注这是 HTML 或是 Markdown；只要直接加标签就可以了。
+
+要制约的只有一些 HTML 区块元素――比如 `<div>`、`<table>`、`<pre>`、`<p>` 等标签，必须在前后加上空行与其它内容区隔开，还要求它们的开始标签与结尾标签不能用制表符或空格来缩进。Markdown 的生成器有足够智能，不会在 HTML 区块标签外加上不必要的 `<p>` 标签。
+
+
+```markdown
+标题
+
+Markdown的标题写法
+# 1号标题
+## 2号标题
+### 3号标题
+#### 4号标题
+##### 5号标题
+###### 6号标题
+
+HTML的标题写法
+<h1>1号标题</h1>
+<h2>2号标题</h2>
+<h3>3号标题</h3>
+<h4>4号标题</h4>
+<h5>5号标题</h5>
+<h6>6号标题</h6>
+
+分割线
+
+Markdown的分割线写法
+---
+
+HTML的分割线写法
+<hr>
+
+换行
+
+Markdown的换行写法（直接按一下回车就行了）
+
+HTML的换行写法
+<br>
+段落
+
+Markdown的段落写法（按照平时那样书写就行了）
+这是一个段落哦
+这是另一个段落
+
+HTML的段落写法
+<p>这是一个段落哦</p>
+<p>这是另一个段落</p>
+超链接
+
+Markdown的超链接写法
+[点我在新窗口中打开-github](https://github.com/)
+
+HTML的超链接写法
+<a href="https://github.com/" target="_blank">点我在新窗口中打开-github</a>
+
+图片
+
+Markdown的图片写法
+![image](https://help.github.com/assets/images/site/invertocat.png)
+
+HTML的图片写法
+<img src="https://help.github.com/assets/images/site/invertocat.png">
+表格
+
+Markdown的表格写法，Markdown不支持合并单元格
+header 1 | header 2
+---|---
+row 1 col 1 | row 1 col 2
+row 2 col 1 | row 2 col 2
+
+HTML的表格写法
+<table border="1">
+    <tr>
+        <td>第一行第一列</td>
+        <td>第一行第二列</td>
+    </tr>
+    <tr>
+        <td colspan="2">合并单元格</td>
+    </tr>
+</table>
+无序列表
+
+Markdown的无序列表写法
+- Perl
+- PHP
+- Python
+- Ruby
+
+HTML的无序列表写法
+<ul>
+    <li>Perl/</li>
+    <li>PHP</li>
+    <li>Python</li>
+    <li>Ruby</li>
+</ul>
+有序列表
+
+Markdown的有序列表写法
+- Linux
+- Apache
+- Mysql
+- PHP
+
+HTML的有序列表写法
+<ol>
+    <li>Linux</li>
+    <li>Apache</li>
+    <li>Mysql</li>
+    <li>PHP</li>
+</ol>
+
+其它
+
+两个无意义的标签
+<div>你好</div>
+<span>Hello</span>
+```
+
+**参考资料：**
+
+- <https://blog.csdn.net/weixin_33709219/article/details/88109087>
+
+### 14. document.getElementById 是用来做什么的？
+
+Document 的方法 getElementById() 返回一个匹配特定 ID的元素引用。由于元素的 ID 在大部分情况下要求是独一无二的，这个方法是一个高效查找特定元素的方法。
+
+```html
+<div id = "main"></div>
+<script>
+  var mainDiv = document.getElementById("main")
+</script>
+```
+
+通过该引用，如`mainDiv`，我们可以对该元素进行众多操作：插入其他元素、获取其属性值、改变其 CSS 样式、监听某些动态操作等。
+
+**参考资料：**
+
+- <http://www.w3school.com.cn/jsref/met_doc_getelementbyid.asp>
+
+### 15. JavaScript 的运行速度和 Python/R 等其他编程语言相比是快还是慢？
+
+JavaScript、Python 和 R 的 stackshare 对比：
+
+![](https://s2.ax1x.com/2019/05/12/EhrQxS.png)
+
+![](https://s2.ax1x.com/2019/05/12/Ehr6aR.png)
+
+三者的计算速度很多时候取决于程序的具体实现，特别是否引入 C/C++ 代码加速。
+
+有人做个一个 Benchmark 测试：
+
+| Language | Time |
+|---|---|
+| C++ | 1.00 |
+| Java | 2.10 |
+| Julia | 2.70 |
+| CPython | 155.31 |
+| Python with Numba | 1.57 |
+| R | 505.09 |
+| R using compiler package | 243.38 |
+
+根据另外的一篇 Node.js 和 Python 的比较（来自https://my.oschina.net/kaixindewo/blog/49956）：
+
+- Node.js 做单纯的运算无疑是最快的，但 Node.js 的 Dict 操作性能太差，List 操
+作却又是表现最好的。
+- xpcshell 做单纯的运算慢于 Node.js，做 Dict 运算快于 Node.js，但做 List 操作
+却是慢的离谱，是最慢的。
+- Python 做单纯的运算是最慢的，Dict 操作表现还不错，List 操作表现也不错，个人
+感觉只要不是做大量的计算，还是比较适合实现复杂的业务逻辑的。
+- PyPy 做单纯的计算表现不俗，做 Dict 操作性能最好，但是做 List 操作还不如传统
+的 Python。
+
+我们需要寻找适合自己的、适合团队的、适合项目的语言，速度只是其中的衡量标准之一。第三方库的发展情况、语言特性、前期代码积累、学习成本、维护成本等等都是我们实际项目中需要综合考虑的问题。
+
+**参考资料：**
+
+- <https://da-14.com/blog/python-vs-nodejs-which-better-your-project>
+- <https://stackshare.io/stackups/javascript-vs-python-vs-r>
+- <https://dzone.com/articles/benchmarking-c-python-r-etc>
+- <https://my.oschina.net/kaixindewo/blog/49956>
+- <https://www.educba.com/python-vs-node-js/>
+
+### 16. Cookie 和 Session 存在的目的是什么？
+
+Cookie 是为了解决 HTTP 协议无状态的缺陷所作的努力，即实现客户端保持状态的方案。具体过程是：网络服务器用 HTTP 头向客户端发送 cookies，客户端的浏览器解析 cookie 并将它保存为一个本地文件，之后向同一服务器的任何请求都会自动携带该 cookie。
+
+而 session 机制采用的是一种在服务器端保持状态的解决方案，服务器使用一种类似于散列表的结构保存信息。
+
+总结：cookie 和 seesion 的目的都是为了保存客户端的状态，不过前者运作的客户端，而后者运作在服务器。
+
+更多请阅读：[Cookie 与 Session 的区别](https://juejin.im/entry/5766c29d6be3ff006a31b84e)
+
+### 17. JavaScript 数据有哪些类型？它和 R/Python 的数据类型是否有什么对应关系？
+
+JavaScript 有 5 种简单的数据类型（基本数据类型），Undefined、Null、Boolean、Number 和 String，。还有 1 种复杂数据类型：Object，Object 本质上是由一组无序的名值对组成的。
+
+- Undefined 类型只有一个值，即特殊的undefined。如果在声明变量时未对其加以初始化，这个变量的值就是 undefined。
+
+- Null 类型也只有一个值，即null，null值表示一个空对象指针。
+
+- Boolean 类型有两个字面值：true 和 false。这两个值是区分大小写的，即 True 和 False 等各种其他大小写形式都不是 Boolean 值，只是标识符。
+
+- Number 类型使用 IEEE754 格式来表示 整数和浮点数值，还有一些带符号的值：+Infinity，-Infinity 和 NaN。
+
+- String 类型用于表示由零或多个 16 位 Unicode 字符组成的字符序列，即字符串。
+
+- Object类型是一种十分复杂的数据类型，是一组数据和功能的集合。对象可以通过执行 new 操作符后跟要创建 的对象类型的名称来创建。而创建 Object 类型的实例并为其添加属性和（或）方法，就可以创建自定义对象。
+
+**JavaScript的数据类型和Python数据类型的对应关系：**
+
+Javascript 的数据类型比较简单， 有 object、string、boolean、number、null 和 undefined，总共六种。Python 有五个内置的简单数据类型 bool、int、long、float 和 complex，另外还有容器类型，代码类型，内部类型等等。
+
+- boolean 类型：Javascript 有 true 和 false。Python有 True 和 False。它们除了大小写没有什么区别。
+
+- Number 类型：Javascript 中所有的数值类型都是实现为 64 位浮点数，也支持 +Infinity，-Infinity 和 NaN。Python 拥有诸多的数值类型，其中的复数类型非常方便。Python 中没有定义 NaN，除零操作会引发异常。
+
+- String 类型：Javascript 采用UTF16编码。Python 使用 ASCII 码。需要调用 encode、decode 来进行编码转换。使用u作为前缀可以指定字符串使用 Unicode 编码。
+
+- 列表：Javascript 内置了 array 类型（array 也是 object）。Python的列表（List）和Javascript的Array比较接近，而元组（Tuple）可以理解为不可改变的列表。
+
+- 字典、哈希表、对象：Javascript 中大量的使用`{}`来创建对象，这些对象和字典没有什么区别，可以使用`[]`或者.来访问对象的成员。可以动态的添加，修改和删除成员。可以认为对象就是 Javascript 的字典或者哈希表。对象的 key 必须是字符串。Python 内置了哈希表（dictS），和 Javascript 不同的是，dictS 可以有各种类型的 key 值。
+
+- 空值：Javascript 定义了两种空值。 undefined 表示变量没有被初始化，null 表示变量已经初始化但是值为空。Python 中不存在未初始化的值，如果一个变量值为空，Python 使用 None 来表示。
+
+**参考资料：** 
+
+- <https://javascript.info/types>
+- <https://realpython.com/python-data-types/>
+- <https://my.oschina.net/taogang/blog/264351>
+
+### 18. 如何设置多个 git 远程仓库，并分别推送和拉取？
+
+```bash
+# default to use origin and main site
+git remote add origin git@github.com:openbiox/Bioinformatics-Resources.git
+
+# set your own remote for pull request
+git remote add your_remote_name git@github.com:your_account/Bioinformatics-Resources.git
+
+# for your local development
+git checkout -b develop
+
+# do dome of change
+# git add .
+# git commit -m "update files"
+
+# pull origin master before push
+git pull origin master
+
+# check and resolve conflict
+git merge master
+git push your_remote_name master
+
+# Start a new pull request
+```
+
+### 19. GitHub 克隆仓库时选择 `git:// `和 `https://` 的差异
+
+- https 是 git clone 到本地，进行了一些文件的修改，当再次提交到 GitHub 远程服务器的时候，都会进行账号与密码的输入。
+
+- ssh git 到本地之后，首次需要进行账号密码的设置，当再次 push 到远程 GitHub 上面的时候就不需要进行账号密码的输入了。
+
+**参考资料：**
+
+- <https://blog.csdn.net/xudailong_blog/article/details/78697628>
+
+### 20. 什么是持续集成？
+
+持续集成是一种软件开发实践，即团队开发成员经常集成他们的工作，通常每个成员每天至少集成一次，也就意味着每天可能会发生多次集成。每次集成都通过自动化的构建（包括编译，发布，自动化测试）来验证，从而尽早地发现集成错误。
+
+**参考资料：**
+
+- [持续集成 From Baike](https://baike.baidu.com/item/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90)
+
+### 21. 什么是敏捷开发？
+
+敏捷软件开发（英语：Agile software development），又称敏捷开发，是一种从 1990 年代开始逐渐引起广泛关注的一些新型软件开发方法，是一种应对快速变化的需求的一种软件开发能力。它们的具体名称、理念、过程、术语都不尽相同，相对于“非敏捷”，更强调程序员团队与业务专家之间的紧密协作、面对面的沟通（认为比书面的文档更有效）、频繁交付新的软件版本、紧凑而自我组织型的团队、能够很好地适应需求变化的代码编写和团队组织方法，也更注重软件开发过程中人的作用。
+敏捷软件开发（或称快速程序开发 RAD）描述了一套软件开发的价值和原则，在这些开发中，需求和解决方案皆通过自组织跨功能团队达成。敏捷软件开发主张适度的项目、进化开发、提前交付与持续改进，并且鼓励快速与灵活的面对开发与变更。这些原则支持许多软件开发方法的定义和持续进化。
+
+敏捷开发以用户的需求进化为核心，采用迭代、循序渐进的方法进行软件开发。在敏捷开发中，软件项目在构建初期被切分成多个子项目，各个子项目的成果都经过测试，具备可视、可集成和可运行使用的特征。换言之，就是把一个大项目分为多个相互联系，但也可独立运行的小项目，并分别完成，在此过程中软件一直处于可使用状态。
+
+**参考资料：**
+
+- [敏捷开发 From Sougou](https://baike.sogou.com/v67155723.htm?fromTitle=%E6%95%8F%E6%8D%B7%E5%BC%80%E5%8F%91)
+- [敏捷软件开发 From wiki](https://zh.wikipedia.org/wiki/%E6%95%8F%E6%8D%B7%E8%BD%AF%E4%BB%B6%E5%BC%80%E5%8F%91)
+
+### 22. GitHub 仓库可以关联哪些第三方网页服务进行发布前的自动测试？
+
+- [travis](https://docs.travis-ci.com/user/customizing-the-build/)
+- [CircleCI](https://circleci.com/)
+
+### 23. GitHub 的 Webhook 可以用来做什么？
+
+Webhook 中文俗称钩子，最常见的是用来检测仓库的变化，包括 push、issue 以及 pull requests，目前钉钉支持的GitHub机器人监测仓库变化就是通过 Webhook 实现的。
+
+以 Push 举例：如果你设置了一个监测 push 事件的 Webhook，那么每当你的这个项目有了任何提交，这个 Webhook 都会被触发，这时 Github 就会发送一个 HTTP POST 请求到你配置好的地址。如此一来，你就可以通过这种方式去自动完成一些重复性工作。一个典型的工具就是 Travis CI。
+
+**参考资料：**
+
+- [Webhook 实践 —— 自动部署](https://jerryzou.com/posts/webhook-practice/)
+- [Node.js的一个实例：Webhook服务自动更新博客](https://www.life2cloud.com/cn/2017/07/nodejs-auto-deploy-blog/)
+
+### 24. MySQL 的开源版本叫什么？它和甲骨文公司维护的版本有什么区别？
+
+MySQL Community Server 社区版本。
+
+MySQL 被甲骨文公司收购后，甲骨文公司不再支持另一个自由软件项目 OpenSolaris 的发展，而原先一些使用 MySQL 的开源软件逐渐转向 MariaDB 或其它的数据库。
+
+### 25.MySQL 和 SQLite 分别适用于哪些网页应用程序？
+
+MySQL：Web网站 和 Web应用:
+
+绝大多数的网站(和Web应用程序)可以忽视约束性地简单工作在MySQL上。这种灵活的和可扩展的工具是易于使用和易于管理的——这被证明非常有助于长期运行。
+定制解决方案:
+如果你工作在一个高度量身定制的解决方案上，MySQL能够很容易地尾随和执行你的规则，这要感谢其丰富的配置设置和操作模式。
+
+SQLite：
+
+嵌入式应用:所有需要迁移性，不需要扩展的应用，例如，单用户的本地应用，移动应用和游戏。
+代替磁盘访问:在很多情况下，需要频繁直接读/写磁盘文件的应用，都很适合转为使用 SQLite ，可以得益于 SQLite 使用 SQL 带来的功能性和简洁性。
+测试:它能秒杀大部分专门针对应用业务逻辑(也就是应用的主要目的：能完成功能)的测试。
+
+### 26. SQLite 数据库能否设置用户名和密码？
+
+> SQLite是一个轻量的、跨平台的、开源的数据库引擎，它的在读写效率、消耗总量、延迟时间和整体简单性上具有的优越性，使其成为移动平台数据库的最佳解决方案（如iOS、Android）。
+> 然而免费版的SQLite有一个致命缺点：不支持加密。这就导致存储在SQLite中的数据可以被任何人用任何文本编辑器查看到。比如国内某团购iOS客户端的DB缓存数据就一览无余：
+
+SQLite 免费版是不需要用户名和密码就可以查看所存储的数据的，并且无法设置像 MySQL 那样设置用户名和密码。但是用户可以用一些收费的加密插件，对所存储的数据进行加密。
+
+- [SQLite Encryption Extension (SEE)](http://www.sqlite.org/index.html)
+- [SQLiteCrypt](http://sqlite-crypt.com/index.htm)
+
+当然也有开源的加密工具：
+
+- [SQLCipher](http://sqlcipher.net/)
+
+**参考资料：**
+
+- <http://foggry.com/blog/2014/05/19/jia-mi-ni-de-sqlite/>
+
+### 27 在 R/Python 中提供 SQLite 和 MySQL 接口的包/模块分别是？
+
+Python
+
+- sqlite - sqlite3
+- mysql - pymysql, MySQLdb
+
+R
+
+- sqlite - RSQLite
+- mysql - RMySQL
+
+### 28. HTML 与 HTML5 的区别是？目前常用哪个？
+
+HTML(HyperText Markup Language)是一种用于创建网页的标准标记语言。HTML5是HTML最新的修订版本，2014年10月由万维网联盟（W3C）完成标准制定。相比于HTML, HTML5 有了一些新的改进，目的是为了在移动设备上支持多媒体：
+
+- 取消了一些过时的 HTML4的标签，主要有：acronym, applet, basefont, big, center, dir, font, frame, frameset, isindex, noframes, strike, tt。
+- 增加了一些新的标签，如：canvas, article, footer, header, mark, nav等。
+- 新的文档类型声明：<!DOCTYPE html>。
+- 当涉及到网站的抓取和索引的时候，对于SEO很友好。
+- 可移植性好，能被大量应用于移动应用程序和游戏。
+
+由于HTML更加完善的特性，以及最新版本的 Safari、Chrome、Firefox 以及 Opera 等浏览器都能支持HTML5,目前的网页开发中HTML5更为常用。
+
+**参考资料：** 
+
+- <https://www.runoob.com/html/html5-intro.html>
+- <https://www.w3.org/TR/html52/>
+
+### 29. 什么是前端开发？什么是后端开发？两者有什么区别？
+
+前端是用户可以直接查看和交互的网站的一部分，它涉及用户可以看到，触摸和体验的一切。主要包括Web页面的结构、Web的外观视觉表现以及 Web 层面的交互实现。前端开发主要使用 HTML、CSS、JavaScript。
+后端是在后台工作的，控制着前端的内容，主要负责程序设计架构思想，管理数据库等。后端更多的是与数据库进行交互以处理相应的业务逻辑，需要考虑的是如何实现功能、数据的存取、平台的稳定性与性能等。后端使用的语言主要有 PHP、ASP、JAVA等等。
+
+举个栗子：在一个网站登陆页面，前端只要需要负责静态页面部分，鼠标移入输入框、移出输入框的颜色变化这部分的内容。但是输入用户名、密码后登录系统的话要连接数据库，这个就需要后台开发做逻辑处理了。
+
+**参考资料：**
+
+- <http://www.differencebetween.net/technology/difference-between-frontend-and-backend/>
+- <https://www.zhihu.com/question/21923056>
+- <https://en.wikipedia.org/wiki/Front_and_back_ends>
+- <https://conceptainc.com/blog/difference-front-end-back-end-development/>
+
+### 30. Rstudio Server 算云服务器吗？是不是可以看作为一台只能可视化使用 Rstudio 的服务器？
+
+Rstudio Server 是云服务器提供一种网页服务应用之一，而不是云服务器本身。RStudio Server 提供了一个图形化的界面（the RStudio IDE） ，运行在远程的 Linux 服务器上。
+
+如果某台云服务器只开放了 Rstudio Server 服务，那么这台云服务器则是一台只能可视化使用 Rstudio 的服务器。
+
+### 31. 类似于MySQL 关系型数据库管理系统有哪些？相比而言，MySQL 最主要的优点在哪？
+
+Oracle、IBM 的 DB2 和微软的 SQL Server。
+
+MySQL 数据库体积小、速度快、总体拥有成本低、开放源代码，其有着广泛的应用，一般中小型网站的开发都选择 MySQL 作为网站数据库。由于其社区版的性能卓越，因此搭配 PHP 和 Apache 服务器可组成良好的开发环境。
+
+### 32. 浏览器，服务器和数据库之间的关系是什么，用户在浏览器中输入一个网址后这三者是怎样工作的?
+
+浏览器提交请示服务到服务器，服务器程序响应浏览器的请求并执行对应程序，相应的程序从数据库中进行操作，数据库把结果返给服务器程序，服务器程序生成浏览器能识别的数据返回到浏览器。
+
+### 33. 云计算中的 laas，Paas，Saas 分别指的是什么，是通过什么来划分的？
+
+云服务可以分成3个大类：
+
+- LaaS：基础设施服务（Infrastructure-as-a-service），把计算基础（服务器、网络技术、存储和数据中心空间）作为一项服务提供给客户。它也包括提供操作系统的虚拟化技术、来管理资源。消费者通过Internet可以从完善的计算机基础设施获得服务。
+- PaaS：平台服务（Platform-as-a-service），把软件研发的平台作为一种服务，供应商提供超过基础设施的服务，提供软件开发环境和运行环境的整套解决方案。
+- SaaS：软件服务（Software-as-a-service），是一种交付模式，其中应用作为一项服务托管，通过Internet提供给用户；帮助客户更好地管理它们的IT项目和服务、确保它们IT应用的质量和性能，监控它们的在线业务。
+
+SaaS 是软件的开发、管理、部署都交给第三方，不需要关心技术问题，可以拿来即用。普通用户接触到的互联网服务，几乎都是 SaaS。PaaS提供软件部署平台（runtime），抽象掉了硬件和操作系统细节，可以无缝地扩展（scaling）。开发者只需要关注自己的业务逻辑，不需要关注底层。LaaS是云服务的最底层，主要提供一些基础资源。它与PaaS的区别是，用户需要自己控制底层，实现基础设施的使用逻辑。
+
+举个栗子：假设你是一个餐饮业者，打算做披萨生意。你可以从头到尾，自己生产披萨，但是这样比较麻烦，需要准备的东西多，因此你决定外包一部分工作，采用他人的服务。你有三个方案。1.LaaS: 他人提供厨房、炉子、煤气，你使用这些基础设施，来烤你的披萨。2.PaaS: 除了基础设施，他人还提供披萨饼皮。你只要把自己的配料洒在饼皮上，让他帮你烤出来就行了。也就是说，你要做的就是设计披萨的味道（海鲜披萨或者鸡肉披萨），他人提供平台服务，让你把自己的设计实现。3.SaaS: 他人直接做好了披萨，不用你的介入，到手的就是一个成品。你要做的就是把它卖出去，最多再包装一下，印上你自己的 Logo。
+
+**参考资料：**
+
+- <https://m.oursky.com/saas-paas-and-iaas-explained-in-one-graphic-d56c3e6f4606>
+- <https://www.zhihu.com/question/20387284>
+- <https://www.computenext.com/blog/when-to-use-saas-paas-and-iaas/>
+
+### 34. 列举几个 HTML 中常见的开放式标签
+
+一般的 HTML 标签需要两个元素，起始和终止，如`<html></html>`。而开放式标签是其中的特例，也叫自关闭的标签。即只需要起始元素即可。
+
+```html
+<img>
+
+<link>
+
+<input>
+
+<hr>
+
+<br>
+
+<source>
+```
+
+**参考资料：**
+
+- <https://blog.csdn.net/alidream37/article/details/80222301>
+- <https://blog.csdn.net/u013314786/article/details/48522083>
+
+### 35.什么是 token 验证？
+
+token 验证主要是指 token 存储在 Authorization Header 中进行的验证。token 验证是无状态的，服务器不记录哪些用户登录了或者哪些 JWT 被发布了，而是每个请求都带上了服务器需要验证的 token，token 放在了 Authorization header 中，形式是 Bearer { JWT }，但是也可以在 post body 里发送，甚至作为 query parameter。
+
+验证流程：
+
+用户输入登录信息
+- 服务器判断登录信息正确，返回一个 token
+- token 存储在客户端，大多数通常在 local storage，但是也可以存储在 session storage 或者 cookie 中。
+- 接着发起请求的时候将 token 放进 Authorization header，或者同样可以通过上面的方式。
+- 服务器端解码 JWT 然后验证 token，如果 token 有效，则处理该请求。
+- 一旦用户登出，token 在客户端被销毁，不需要经过服务器端。
+
+**参考资料：**
+
+- <https://auth0.com/blog/cookies-vs-tokens-definitive-guide/>
+
+### 36.什么是微服务？
+
+微服务是一种以业务功能为主的服务设计概念，每一个服务都具有自主运行的业务功能，对外开放不受语言限制的 API (最常用的是 HTTP)，应用程序则是由一个或多个微服务组成。
+
+微服务的另一个对比是单体式应用程序。单体式应用表示一个应用程序内包含了所有需要的业务功能，并且使用像主从式架构 (Client/Server) 或是多层次架构 (N-tier) 实现，虽然它也是能以分布式应用程序来实现，但是在单体式应用内，每一个业务功能是不可分割的。若要对单体式应用进行扩展则必须将整个应用程序都放到新的运算资源（如：虚拟机） 内，但事实上应用程序中最吃资源、需要运算资源的仅有某个业务部分（例如跑分析报表或是数学算法分析），但因为单体式应用无法分割该部分，因此无形中会有大量的资源浪费的现象。
+
+微服务运用了以业务功能的设计概念，应用程序在设计时就能先以业务功能或流程设计先行分割，将各个业务功能都独立实现成一个能自主运行的个体服务，然后再利用相同的协议将所有应用程序需要的服务都组合起来，形成一个应用程序。若需要针对特定业务功能进行扩展时，只要对该业务功能的服务进行扩展就好，不需要整个应用程序都扩展，同时，由于微服务是以业务功能导向的实现，因此不会受到应用程序的干扰，微服务的管理员可以视运算资源的需要来配置微服务到不同的运算资源内，或是布建新的运算资源并将它配置进去。
+
+**参考资料：**
+
+- [微服務 wiki](https://zh.wikipedia.org/wiki/%E5%BE%AE%E6%9C%8D%E5%8B%99)
+
+### 37. Golang 和 Node.js 用于开发网页 API 的框架有哪些？
+
+- Golang：Beego，Martini，Gorilla，GoCraft，Net/HTTP等
+- Node.js：restify，ActionHero.js，LoopBack，Fortune.js等
+
+### 38.什么是 RESTful API？
+
+首先明白REST -- Representational State Transfer，Representational：某种表现形式，比如用JSON，XML，JPEG等；
+State Transfer：状态变化,通过HTTP动词实现。
+
+所以REST英语的直译就是“表现层状态转移”。RESTful API就是REST风格的API。RESTful API由后台也就是SERVER来提供前端来调用。前端调用API向后台发起HTTP请求，后台响应请求将处理结果反馈给前端。
+
+**参考资料：**
+
+- <https://blog.csdn.net/hjc1984117/article/details/77334616>
+
+### 39.什么是 Websocket ？
+
+WebSocket是一种通信协议，可在单个TCP连接上进行全双工通信。WebSocket协议在2011年由IETF标准化为RFC 6455，后由RFC 7936补充规范。Web IDL中的WebSocket API由W3C标准化。
+
+WebSocket使得客户端和服务器之间的数据交换变得更加简单，允许服务端主动向客户端推送数据。在WebSocket API中，浏览器和服务器只需要完成一次握手，两者之间就可以创建持久性的连接，并进行双向数据传输。
+
+**参考资料：**
+
+- <https://zh.wikipedia.org/wiki/WebSocket>
+
+## 编程题
+
+### 1. 使用最基础的 HTML/CSS/JavaScript 语法，设计一个简单的单页网页界面（至少应该包含一二三级标题和正文、表格、内容分栏、超链接、图片、视频、点击动画等）
+
+```html
+<html>
+
+<body>
+    <h1>Head 1</h1>
+    <h2>Head 2</h2>
+    <h3>Head 3</h3>
+    <p>Some of text</p>
+    <table>
+        <tr>
+            <th>tb_head_1</th>
+            <th>tb_head_2</th>
+        </tr>
+        <tr>
+            <td>Row1 and col1</td>
+            <td>Row1 and col2</td>
+        </tr>
+    </table>
+    <br />
+    <a href="https://life2cloud.com"></a>
+    <br />
+    <a href="https://s2.ax1x.com/2019/04/27/EuBBhF.jpg"><img src="https://s2.ax1x.com/2019/04/27/EuBBhF.jpg" /></a>
+    <br />
+    <video width="320" height="240" controls>
+        <source src="https://www.runoob.com/try/demo_source/movie.mp4" type="video/mp4">
+    </video>
+
+    <h1 onclick="this.innerHTML='Oooo!'">Click me!</h1>
+    <br />
+
+    <div id="wrapper" style="float:inherit">
+        <div id="left">Left</div>
+        <div id="right">Right</div>
+    </div>
+</body>
+
+</html>
+
+<style>
+    html,
+    body {
+        margin: 0;
+        height: 100%
+    }
+
+    #wrapper {
+        margin: 0 auto;
+        width: 80%;
+        height: 100%
+    }
+
+    #left {
+        float: left;
+        width: 30%;
+        height: 100%;
+        background: #eeeeee
+    }
+
+    #right {
+        float: left;
+        width: 70%;
+        height: 100%;
+        background: #eeeecc
+    }
+</style>
+```
+
+### 2. 使用 JavaScript 编写一个可以生成斐波那锲数列的函数，输入为n，表示该数列所包含的数字个数
+
+```js
+function fib(n){
+    if(n <= 2){
+        return 1;
+    }
+    return fib(n-1)+fib(n-2);
+}
+document.write(fib(10)); 
+//55
+```
+
+### 3. 比较相同功能的函数在 JavaScript，R，和 Python 之间的差别（语法+速度）
+
+```{node}
+function calulate_1(n) {
+  var start = 0
+  for(i = 0; i < n; i ++) {
+    start = start + i
+  }
+  return(start)
+}
+
+function calulate_2(n) {
+  start = new Array()
+  for(i = 0; i < n; i ++) {
+    start.push(i)
+  }
+  return(start.slice(0, return_len))
+}
+
+function calulate_3(n) {
+  var start = {}
+  for(i = 0; i < n; i ++) {
+    start[i] = i
+  }
+  start_array = new Array()
+  for(i = 0; i < return_len; i ++) {
+    start_array.push(start[i])
+  }
+  return(start_array)
+}
+
+test_size = 10000000
+return_len = 20
+
+console.time('calulate_1')
+console.log(calulate_1(test_size))
+console.timeEnd('calulate_1')
+
+console.time('calulate_2')
+console.log(calulate_2(test_size))
+console.timeEnd('calulate_2')
+
+console.time('calulate_3')
+console.log(calulate_3(test_size))
+console.timeEnd('calulate_3')
+```
+
+```{python}
+import datetime
+def calulate_1(n) :
+    start = 0
+    for i in range(n):
+        start = start + i
+    return (start)
+    
+def calulate_2(n) :
+    start = []
+    for i in range(n):
+        start.append(i)
+    return (start[0:return_len])
+    
+def calulate_3(n) :
+    start = {}
+    for i in range(n):
+        start[i] = i
+    start_array = []
+    for key in start.keys():
+        if key > return_len - 1:
+            return (start_array)
+        start_array.append(start[key])
+
+test_size = 10000000
+return_len = 20
+  
+start = datetime.datetime.now()
+print(calulate_1(test_size))
+end = datetime.datetime.now()
+time_cost = end - start
+print (time_cost)
+
+start = datetime.datetime.now()
+print(calulate_2(test_size))
+end = datetime.datetime.now()
+time_cost = end - start
+print (time_cost)
+
+start = datetime.datetime.now()
+print(calulate_3(test_size))
+end = datetime.datetime.now()
+time_cost = end - start
+print (time_cost)
+```
+
+```{r}
+calulate_1 <- function(n) {
+  start <- 0
+  start <- sum(0:(n-1))
+  return(start)
+}
+calulate_2 <- function(n) {
+  start <- 0
+  start <- 0:(n-1)
+  return(start[1:10])
+}
+
+calulate_3 <- function(n) {
+  start = lapply(0:(n-1), function(x){
+    return(x)
+  })
+  start_vec <- sapply(0:(return_len-1), function(x){
+    return(x)
+  })
+  return(start_vec)
+}
+test_size = 10000000
+return_len = 20
+
+system.time(print(calulate_1(test_size)))
+system.time(print(calulate_2(test_size)))
+system.time(print(calulate_3(test_size)))
+```
+
+### 4. 尝试本地部署 Gitlab 服务
+
+**参考资料：**
+
+- <https://www.cnblogs.com/straycats/p/7637373.html>
+
+### 5. 使用 MySQL 数据库创建一个用于存储用户信息的数据表：包含 username, email, password 三个字段，并分别使用 SQL 和 Python/R 客户端插入、删除和更新一行数据，密码使用 SHA256 进行加密
+
+```r
+library(RMySQL)
+con = dbConnect(MySQL(), user = "root", password = "@Shixiang1994")
+# creating a database using RMySQL in R
+dbSendQuery(con, "CREATE DATABASE test_user;")
+dbSendQuery(con, "USE test_user;")
+dbDisconnect(con)
+# reconnecting to database we just created using following command in R :
+mydb = dbConnect(MySQL(), user = "root", password = "xxxxxx", dbname="test_user")
+
+init_table = data.frame(
+    username = "user1",
+    email = "wxxx@163.com",
+    password = digest::sha1("yes",algo = "sha256"),
+    stringsAsFactors = FALSE
+)
+
+append_table = data.frame(
+    username = "user2",
+    email = "wxxx@163.com",
+    password = digest::sha1("another password",algo = "sha256"),
+    stringsAsFactors = FALSE
+)
+
+dbWriteTable(mydb, name = "test", value = init_table, row.names = FALSE, overwrite = TRUE)
+dbReadTable(mydb, "test")
+
+# 追加数据
+dbWriteTable(mydb, name = "test", value = append_table, row.names = FALSE, append = TRUE)
+dbReadTable(mydb, "test")
+
+# 更新数据
+dbSendQuery(mydb, "UPDATE test set username = 'user3' where username = 'user2'")
+dbReadTable(mydb, "test")
+
+# 删除数据
+dbSendQuery(mydb, "DELETE FROM test where username = 'user1'")
+dbReadTable(mydb, "test")
+
+dbDisconnect(mydb)
+```
+
+**参考资料：**
+
+- <https://mkmanu.wordpress.com/2014/07/24/r-and-mysql-a-tutorial-for-beginners/>
